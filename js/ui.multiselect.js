@@ -250,41 +250,33 @@ $.widget("ui.multiselect", {
 		temp.detach().appendTo(parent);
 		this.element.trigger('change');
 
-		if (selected) {
-			var selectedItem = this._cloneWithData(item);
-			item[this.options.hide](this.options.animated, function() { $(this).remove(); });
-			selectedItem.appendTo(this.selectedList).hide()[this.options.show](this.options.animated);
+		var succ = null, i = item.data('idx');
+		var items = (selected ? this.selectedList.find('li') : this.availableList.find('li'));
+		var comparator = this.options.nodeComparator;
+		var direction = comparator(item, $(items[i]));
 
-			this._applyItemState(selectedItem, true);
-			return selectedItem;
-		} else {
-
-			// look for successor based on initial option index
-			var items = this.availableList.find('li'), comparator = this.options.nodeComparator;
-			var succ = null, i = item.data('idx'), direction = comparator(item, $(items[i]));
-
-			// TODO: test needed for dynamic list populating
-			if ( direction ) {
-				while (i>=0 && i<items.length) {
-					direction > 0 ? i++ : i--;
-					if ( direction != comparator(item, $(items[i])) ) {
-						// going up, go back one item down, otherwise leave as is
-						succ = items[direction > 0 ? i : i+1];
-						break;
-					}
+		// TODO: test needed for dynamic list populating
+		if ( direction ) {
+			while (i>=0 && i<items.length) {
+				direction > 0 ? i++ : i--;
+				if ( direction != comparator(item, $(items[i])) ) {
+					// going up, go back one item down, otherwise leave as is
+					succ = items[direction > 0 ? i : i+1];
+					break;
 				}
-			} else {
-				succ = items[i];
 			}
-
-			var availableItem = this._cloneWithData(item);
-			succ ? availableItem.insertBefore($(succ)) : availableItem.appendTo(this.availableList);
-			item[this.options.hide](this.options.animated, function() { $(this).remove(); });
-			availableItem.hide()[this.options.show](this.options.animated);
-
-			this._applyItemState(availableItem, false);
-			return availableItem;
+		} else {
+			succ = items[i];
 		}
+
+		var pickedItem = this._cloneWithData(item);
+		var target = (selected ? this.selectedList : this.availableList);
+		succ ? pickedItem.insertBefore($(succ)) : pickedItem.appendTo(target);
+		item[this.options.hide](this.options.animated, function() { $(this).remove(); });
+		pickedItem.hide()[this.options.show](this.options.animated);
+
+		this._applyItemState(pickedItem, (selected? true: false));
+		return pickedItem;
 	},
 	_applyItemState: function(item, selected) {
 		if (selected) {
