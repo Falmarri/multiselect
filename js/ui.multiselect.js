@@ -252,6 +252,7 @@ $.widget("ui.multiselect", {
 
 		var succ = null, i = item.data('idx');
 		var items = (selected ? this.selectedList.find('li') : this.availableList.find('li'));
+		if(i >= items.length) i = items.length - 1;
 		var comparator = this.options.nodeComparator;
 		var direction = comparator(item, $(items[i]));
 
