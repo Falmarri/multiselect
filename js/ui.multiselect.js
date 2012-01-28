@@ -42,8 +42,8 @@ $.widget("ui.multiselect", {
 		width: null,
 		height: null,
 		nodeComparator: function(node1,node2) {
-			var text1 = node1.text(),
-			    text2 = node2.text();
+			var text1 = node1.text().toLowerCase(),
+			    text2 = node2.text().toLowerCase();
 			return text1 == text2 ? 0 : (text1 < text2 ? -1 : 1);
 		},
 		includeRemoveAll: true,
@@ -106,7 +106,7 @@ $.widget("ui.multiselect", {
 		}
 
 		// init lists
-		this._populateLists(this.element.find('option'));
+		this._populateLists(this.element.find('option:not(:disabled)'));
 
 		// make selection sortable
 		if (this.options.sortable) {
@@ -235,7 +235,7 @@ $.widget("ui.multiselect", {
 	},
 	_getOptionNode: function(option) {
 		option = $(option);
-		var node = $('<li class="ui-state-default ui-element" title="'+option.text()+'"><span class="ui-icon"/>'+option.text()+'<a href="#" class="action"><span class="ui-corner-all ui-icon"/></a></li>').hide();
+		var node = $('<li class="ui-state-default ui-element ' + option.attr("class") + ' " title="'+option.text()+'"><span class="ui-icon"/>'+option.text()+'<a href="#" class="action"><span class="ui-corner-all ui-icon"/></a></li>').hide();
 		node.data('optionLink', option);
 		return node;
 	},
